@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '../components/layout/Navbar';
 import { LandingFooter } from '../components/landing/LandingFooter';
 import { api } from '../services/api';
-import { Star, MapPin, Briefcase, Award, Loader2, UserCircle, MessageSquare, Calendar } from 'lucide-react';
+import { Star, MapPin, Briefcase, Award, Loader2, UserCircle, Calendar } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { useAuthStore } from '../stores/useAuthStore';
+import { useAppStore } from '../stores/useAppStore';
 
 export const PublicProviders = () => {
     const { category } = useParams<{ category: string }>();
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuthStore();
+    const { addLog } = useAppStore();
+
     const [providers, setProviders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -28,6 +34,22 @@ export const PublicProviders = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleBook = (providerName: string) => {
+        if (!isAuthenticated) {
+            navigate('/login');
+            return;
+        }
+
+        addLog({
+            id: Math.random().toString(),
+            user: 'System',
+            action: `User initiated booking for ${providerName}`,
+            timestamp: new Date().toLocaleString(),
+        });
+
+        alert(`Request sent to ${providerName}! They will contact you shortly to confirm the booking.`);
     };
 
     return (
@@ -109,11 +131,12 @@ export const PublicProviders = () => {
                                     </div>
 
                                     <div className="flex gap-3 mt-4">
-                                        <Link to="/login" className="flex-1">
-                                            <Button className="w-full btn-primary shadow-indigo py-3 font-bold flex items-center justify-center gap-2">
-                                                <Calendar className="w-4 h-4" /> Book Now
-                                            </Button>
-                                        </Link>
+                                        <Button
+                                            onClick={() => handleBook(provider.name)}
+                                            className="w-full btn-primary shadow-indigo py-3 font-bold flex items-center justify-center gap-2"
+                                        >
+                                            <Calendar className="w-4 h-4" /> Book Now
+                                        </Button>
                                     </div>
                                 </motion.div>
                             ))}
