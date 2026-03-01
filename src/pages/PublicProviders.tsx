@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from '../components/layout/Navbar';
 import { LandingFooter } from '../components/landing/LandingFooter';
 import { api } from '../services/api';
-import { Star, MapPin, Briefcase, Award, Loader2, UserCircle, Calendar } from 'lucide-react';
+import { Star, MapPin, Briefcase, Award, Loader2, UserCircle, Calendar, X } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useAppStore } from '../stores/useAppStore';
@@ -18,6 +18,9 @@ export const PublicProviders = () => {
     const [providers, setProviders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+
+    const [bookingProvider, setBookingProvider] = useState<any>(null);
+    const [bookingData, setBookingData] = useState({ description: '', date: '', time: '' });
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -36,20 +39,32 @@ export const PublicProviders = () => {
         }
     };
 
-    const handleBook = (providerName: string) => {
+    const handleBookClick = (provider: any) => {
         if (!isAuthenticated) {
             navigate('/login');
+            return;
+        }
+        setBookingProvider(provider);
+        setBookingData({ description: '', date: '', time: '' });
+    };
+
+    const confirmBooking = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!bookingData.description || !bookingData.date || !bookingData.time) {
+            alert('Please fill out all booking details.');
             return;
         }
 
         addLog({
             id: Math.random().toString(),
             user: 'System',
-            action: `User initiated booking for ${providerName}`,
+            action: `User booked ${bookingProvider.name} for ${bookingData.date} at ${bookingData.time}`,
             timestamp: new Date().toLocaleString(),
         });
 
-        alert(`Request sent to ${providerName}! They will contact you shortly to confirm the booking.`);
+        alert(`Booking requested with ${bookingProvider.name}!\n\nDate: ${bookingData.date}\nTime: ${bookingData.time}\n\nThey will contact you shortly.`);
+        setBookingProvider(null);
     };
 
     return (
@@ -132,7 +147,7 @@ export const PublicProviders = () => {
 
                                     <div className="flex gap-3 mt-4">
                                         <Button
-                                            onClick={() => handleBook(provider.name)}
+                                            onClick={() => handleBookClick(provider)}
                                             className="w-full btn-primary shadow-indigo py-3 font-bold flex items-center justify-center gap-2"
                                         >
                                             <Calendar className="w-4 h-4" /> Book Now
@@ -146,6 +161,96 @@ export const PublicProviders = () => {
             </main>
 
             <LandingFooter />
+
+            {/* Booking Modal */}
+            <AnimatePresence>
+                {bookingProvider && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl relative border border-slate-200 dark:border-slate-800"
+                        >
+                            <button
+                                onClick={() => setBookingProvider(null)}
+                                className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-full transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                                Book {bookingProvider.name}
+                            </h2>
+                            <p className="text-sm text-slate-500 mb-6">
+                                Please provide details about the problem and your preferred schedule.
+                            </p>
+
+                            <form onSubmit={confirmBooking} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                                        Problem Description
+                                    </label>
+                                    <textarea
+                                        value={bookingData.description}
+                                        onChange={(e) => setBookingData({ ...bookingData, description: e.target.value })}
+                                        className="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white"
+                                        placeholder="Describe the issue you need help with..."
+                                        rows={4}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                                            Date
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={bookingData.date}
+                                            onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
+                                            className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                                            Time
+                                        </label>
+                                        <input
+                                            type="time"
+                                            value={bookingData.time}
+                                            onChange={(e) => setBookingData({ ...bookingData, time: e.target.value })}
+                                            className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-white"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 flex gap-3">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => setBookingProvider(null)}
+                                        className="flex-1"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit" className="flex-1 btn-primary">
+                                        Confirm Booking
+                                    </Button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
