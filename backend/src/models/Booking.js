@@ -17,9 +17,21 @@ const bookingSchema = new mongoose.Schema(
             required: [true, 'Service type is required'],
             trim: true,
         },
+        description: {
+            type: String,
+            required: false,
+        },
         date: {
-            type: Date,
+            type: String, // changing to String for easier UI handling or Date tracking
             required: [true, 'Booking date is required'],
+        },
+        time: {
+            type: String,
+            required: [false],
+        },
+        price: {
+            type: Number,
+            default: 0,
         },
         status: {
             type: String,

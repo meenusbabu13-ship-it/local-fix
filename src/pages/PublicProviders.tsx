@@ -12,7 +12,7 @@ import { useAppStore } from '../stores/useAppStore';
 export const PublicProviders = () => {
     const { category } = useParams<{ category: string }>();
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuthStore();
+    const { isAuthenticated, token } = useAuthStore();
     const { addLog } = useAppStore();
 
     const [providers, setProviders] = useState<any[]>([]);
@@ -48,7 +48,9 @@ export const PublicProviders = () => {
         setBookingData({ description: '', date: '', time: '' });
     };
 
-    const confirmBooking = (e: React.FormEvent) => {
+    const [bookingLoading, setBookingLoading] = useState(false);
+
+    const confirmBooking = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!bookingData.description || !bookingData.date || !bookingData.time) {
@@ -56,15 +58,35 @@ export const PublicProviders = () => {
             return;
         }
 
-        addLog({
-            id: Math.random().toString(),
-            user: 'System',
-            action: `User booked ${bookingProvider.name} for ${bookingData.date} at ${bookingData.time}`,
-            timestamp: new Date().toLocaleString(),
-        });
+        if (!token) {
+            alert('Authentication required!');
+            return;
+        }
 
-        alert(`Booking requested with ${bookingProvider.name}!\n\nDate: ${bookingData.date}\nTime: ${bookingData.time}\n\nThey will contact you shortly.`);
-        setBookingProvider(null);
+        setBookingLoading(true);
+
+        try {
+            await api.createBooking({
+                providerId: bookingProvider._id,
+                date: bookingData.date,
+                time: bookingData.time,
+                description: bookingData.description,
+            }, token);
+
+            addLog({
+                id: Math.random().toString(),
+                user: 'System',
+                action: `User booked ${bookingProvider.name} for ${bookingData.date} at ${bookingData.time}`,
+                timestamp: new Date().toLocaleString(),
+            });
+
+            alert(`Booking requested with ${bookingProvider.name}!\n\nDate: ${bookingData.date}\nTime: ${bookingData.time}\n\nThey will contact you shortly.`);
+            setBookingProvider(null);
+        } catch (err: any) {
+            alert(err.message || 'Failed to request booking');
+        } finally {
+            setBookingLoading(false);
+        }
     };
 
     return (
@@ -239,10 +261,11 @@ export const PublicProviders = () => {
                                         variant="outline"
                                         onClick={() => setBookingProvider(null)}
                                         className="flex-1"
+                                        disabled={bookingLoading}
                                     >
                                         Cancel
                                     </Button>
-                                    <Button type="submit" className="flex-1 btn-primary">
+                                    <Button type="submit" className="flex-1 btn-primary" isLoading={bookingLoading} disabled={bookingLoading}>
                                         Confirm Booking
                                     </Button>
                                 </div>

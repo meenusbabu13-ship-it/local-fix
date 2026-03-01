@@ -156,4 +156,18 @@ export const api = {
         if (!response.ok) throw new Error(data.message || 'Failed to fetch provider dashboard');
         return data;
     },
+
+    async createBooking(bookingData: any, token: string): Promise<any> {
+        const response = await fetch(`${API_URL}/users/booking`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(bookingData),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to create booking');
+        return data;
+    },
 };

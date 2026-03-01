@@ -1,4 +1,6 @@
 import User from '../models/User.js';
+import Booking from '../models/Booking.js';
+import Provider from '../models/Provider.js';
 
 // @desc    Get user profile
 // @route   GET /api/users/profile
@@ -54,6 +56,42 @@ export const updateUserProfile = async (req, res, next) => {
                 email: updatedUser.email,
                 role: updatedUser.role,
             },
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Create a new booking
+// @route   POST /api/users/booking
+// @access  Private (User only)
+export const createBooking = async (req, res, next) => {
+    try {
+        const { providerId, date, time, description } = req.body;
+
+        const provider = await Provider.findById(providerId);
+        if (!provider) {
+            return res.status(404).json({
+                success: false,
+                message: 'Provider not found.',
+            });
+        }
+
+        const booking = await Booking.create({
+            userId: req.user.id,
+            providerId: provider._id,
+            service: provider.serviceCategory,
+            date,
+            time,
+            description,
+            price: provider.pricing,
+            status: 'pending'
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Booking created successfully.',
+            booking
         });
     } catch (error) {
         next(error);
