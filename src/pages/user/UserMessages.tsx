@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '../../components/ui/Card';
-import { Search, Send, Phone, Video, MoreVertical, Paperclip, Mic } from 'lucide-react';
+import { Search, Send, Phone, Video, MoreVertical, Paperclip, Mic, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const UserMessages = () => {
@@ -42,7 +42,7 @@ export const UserMessages = () => {
             className="h-[calc(100vh-8rem)] flex gap-6"
         >
             {/* Chat List */}
-            <Card className="w-1/3 flex flex-col p-0 overflow-hidden">
+            <Card className="w-1/3 flex flex-col p-0 overflow-hidden bg-slate-50 dark:bg-slate-900 border-none rounded-r-none">
                 <div className="p-4 border-b border-gray-100 dark:border-gray-800">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Messages</h2>
                     <div className="relative">
@@ -50,103 +50,58 @@ export const UserMessages = () => {
                         <input
                             type="text"
                             placeholder="Search providers..."
-                            className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm border-none focus:ring-2 focus:ring-primary/20"
+                            disabled
+                            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-800 rounded-lg text-sm border-none focus:ring-2 focus:ring-primary/20 cursor-not-allowed opacity-50"
                         />
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto">
-                    {chats.map((chat, idx) => (
-                        <div
-                            key={chat.id}
-                            onClick={() => setSelectedChat(idx)}
-                            className={`p-4 flex gap-3 cursor-pointer transition-colors border-b border-gray-50 dark:border-gray-800/50 ${selectedChat === idx ? 'bg-primary/5 dark:bg-primary/10' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
-                                }`}
-                        >
-                            <div className="relative">
-                                <img src={chat.avatar} alt={chat.name} className="w-12 h-12 rounded-full object-cover" />
-                                {chat.online && <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-gray-900"></div>}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-start mb-1">
-                                    <h4 className={`font-bold text-sm truncate ${selectedChat === idx ? 'text-primary' : 'text-gray-900 dark:text-white'}`}>
-                                        {chat.name}
-                                    </h4>
-                                    <span className="text-xs text-gray-400">{chat.time}</span>
-                                </div>
-                                <p className={`text-sm truncate ${chat.unread ? 'font-bold text-gray-900 dark:text-white' : 'text-gray-500'}`}>
-                                    {chat.lastMsg}
-                                </p>
-                            </div>
-                            {chat.unread > 0 && (
-                                <div className="flex flex-col justify-center">
-                                    <span className="w-5 h-5 bg-primary text-white text-[10px] font-bold flex items-center justify-center rounded-full">
-                                        {chat.unread}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                <div className="flex-1 overflow-y-auto flex items-center justify-center p-6 text-center">
+                    <div>
+                        <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                        <p className="text-slate-500 text-sm">No active conversations</p>
+                    </div>
                 </div>
             </Card>
 
             {/* Chat Window */}
-            <Card className="flex-1 flex flex-col p-0 overflow-hidden bg-white dark:bg-gray-900">
+            <Card className="flex-1 flex flex-col p-0 overflow-hidden bg-white dark:bg-gray-900 rounded-l-none">
                 {/* Header */}
-                <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-gray-900 z-10 shadow-sm">
-                    <div className="flex items-center gap-3">
-                        <img src={chats[selectedChat].avatar} alt="" className="w-10 h-10 rounded-full" />
-                        <div>
-                            <h3 className="font-bold text-gray-900 dark:text-white">{chats[selectedChat].name}</h3>
-                            <p className="text-xs text-emerald-500 font-medium">Online now</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-2">
-                        <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500"><Phone className="w-5 h-5" /></button>
-                        <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500"><Video className="w-5 h-5" /></button>
-                        <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500"><MoreVertical className="w-5 h-5" /></button>
-                    </div>
+                <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-gray-900 z-10 shadow-sm min-h-[73px]">
+                    <div className="text-sm font-bold text-slate-400">Select a perfect provider to start chatting</div>
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50 dark:bg-black/20">
-                    {messages.map((msg) => (
-                        <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[70%] rounded-2xl px-5 py-3 shadow-sm ${msg.sender === 'me'
-                                    ? 'bg-primary text-white rounded-br-sm'
-                                    : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm'
-                                }`}>
-                                <p className="text-sm">{msg.text}</p>
-                                <p className={`text-[10px] mt-1 text-right ${msg.sender === 'me' ? 'text-white/70' : 'text-gray-400'}`}>
-                                    {msg.time}
-                                </p>
-                            </div>
+                <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50 dark:bg-black/20 flex items-center justify-center text-center">
+                    <div>
+                        <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-sm mx-auto mb-4 border border-slate-100 dark:border-gray-700">
+                            <Send className="w-6 h-6 text-slate-300" />
                         </div>
-                    ))}
+                        <h3 className="font-bold text-slate-700 dark:text-slate-300 mb-1">Your Inbox is Empty</h3>
+                        <p className="text-slate-500 text-sm max-w-[250px] mx-auto">Once you contact a provider or book a service, your messages will appear here.</p>
+                        <button onClick={() => window.location.href = '/services'} className="mt-6 px-6 py-2 bg-primary text-white rounded-full text-sm font-bold hover:bg-primary-dark transition-colors shadow-lg shadow-indigo-500/25">
+                            Find a Provider
+                        </button>
+                    </div>
                 </div>
 
                 {/* Input Area */}
-                <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+                <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 opacity-50 pointer-events-none">
                     <div className="flex gap-2 items-end">
-                        <button className="p-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors">
+                        <button className="p-3 text-gray-400 rounded-xl">
                             <Paperclip className="w-5 h-5" />
                         </button>
                         <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center p-2">
                             <input
                                 type="text"
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
+                                disabled
                                 placeholder="Type a message..."
-                                className="flex-1 bg-transparent border-none focus:ring-0 text-sm p-2"
-                                onKeyDown={(e) => e.key === 'Enter' && setMessage('')}
+                                className="flex-1 bg-transparent border-none text-sm p-2"
                             />
-                            <button className="p-2 text-gray-400 hover:text-gray-600">
+                            <button className="p-2 text-gray-400">
                                 <Mic className="w-4 h-4" />
                             </button>
                         </div>
-                        <button
-                            className="p-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
-                            onClick={() => setMessage('')}
-                        >
+                        <button className="p-3 bg-gray-300 dark:bg-gray-700 text-white rounded-xl">
                             <Send className="w-5 h-5" />
                         </button>
                     </div>

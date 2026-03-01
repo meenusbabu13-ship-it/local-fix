@@ -46,22 +46,18 @@ export const UserProfile = () => {
 
                         <div className="flex justify-center gap-6 py-6 border-t border-gray-100 dark:border-gray-800">
                             <div className="text-center">
-                                <p className="text-xl font-bold text-gray-900 dark:text-white">12</p>
+                                <p className="text-xl font-bold text-gray-900 dark:text-white">0</p>
                                 <p className="text-xs text-gray-500 uppercase tracking-wide">Bookings</p>
                             </div>
                             <div className="text-center">
-                                <p className="text-xl font-bold text-gray-900 dark:text-white">4.9</p>
+                                <p className="text-xl font-bold text-gray-900 dark:text-white">N/A</p>
                                 <p className="text-xs text-gray-500 uppercase tracking-wide">Rating</p>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-xl font-bold text-gray-900 dark:text-white">2</p>
-                                <p className="text-xs text-gray-500 uppercase tracking-wide">Years</p>
                             </div>
                         </div>
 
                         <Button
-                            variant={isEditing ? 'ghost' : 'primary'}
-                            className="w-full"
+                            variant={isEditing ? 'ghost' : 'outline'} /* Fixed variant type */
+                            className="w-full bg-slate-100 text-slate-900 border border-slate-200 shadow-none hover:bg-slate-200"
                             onClick={() => setIsEditing(!isEditing)}
                         >
                             {isEditing ? 'Cancel Edit' : 'Edit Profile'}
@@ -75,8 +71,8 @@ export const UserProfile = () => {
                             <Award className="w-6 h-6" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-amber-900 dark:text-amber-100">Gold Member</h3>
-                            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">You've saved $145.00 this year with LocalFix+ membership.</p>
+                            <h3 className="font-bold text-amber-900 dark:text-amber-100">Standard Member</h3>
+                            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">Upgrade to LocalFix+ for exclusive discounts.</p>
                             <button className="text-sm font-bold text-amber-600 dark:text-amber-400 mt-3 hover:underline">View Benefits</button>
                         </div>
                     </div>
@@ -120,40 +116,13 @@ export const UserProfile = () => {
                     <>
                         <Card>
                             <h3 className="font-bold text-lg mb-6">Service History</h3>
-                            <div className="space-y-6">
-                                {[
-                                    { title: 'Full Home Cleaning', date: 'Oct 24, 2023', provider: 'Sparkle Cleaners', price: '$120.00', status: 'Completed', logo: 'SC' },
-                                    { title: 'Leaky Faucet Repair', date: 'Sep 12, 2023', provider: "Dave's Plumbing", price: '$85.00', status: 'Completed', logo: 'DP' },
-                                    { title: 'Electrical Inspection', date: 'Aug 05, 2023', provider: 'PowerSafe Ltd', price: '$150.00', status: 'Completed', logo: 'PS' },
-                                ].map((item, idx) => (
-                                    <div key={idx} className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors border border-gray-100 dark:border-gray-800">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-500">
-                                                {item.logo}
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-gray-900 dark:text-white">{item.title}</h4>
-                                                <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                                                    <Calendar className="w-3 h-3" />
-                                                    <span>{item.date}</span>
-                                                    <span>•</span>
-                                                    <span>{item.provider}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-bold text-gray-900 dark:text-white">{item.price}</p>
-                                            <div className="flex items-center justify-end gap-1 mt-1 text-xs font-bold text-emerald-600">
-                                                <Shield className="w-3 h-3" />
-                                                <span>Verified</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="space-y-6 text-center py-12">
+                                <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                                <p className="text-slate-500">You haven't booked any services yet.</p>
+                                <Button className="mt-4 btn-primary shadow-indigo" onClick={() => window.location.href = '/services'}>
+                                    Book a Service
+                                </Button>
                             </div>
-                            <button className="w-full mt-6 py-2 text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">
-                                Show All History
-                            </button>
                         </Card>
                     </>
                 )}
