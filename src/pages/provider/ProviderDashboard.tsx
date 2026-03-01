@@ -18,7 +18,8 @@ export const ProviderDashboard = () => {
                 try {
                     const data = await api.getProviderDashboard(token);
                     if (data.success && data.bookings) {
-                        const mappedBookings = data.bookings.map((b: any) => ({
+                        const activeBookings = data.bookings.filter((b: any) => b.status === 'pending' || b.status === 'confirmed');
+                        const mappedBookings = activeBookings.map((b: any) => ({
                             id: b._id,
                             clientName: b.userId?.name || 'Client',
                             clientAvatar: `https://ui-avatars.com/api/?name=${b.userId?.name || 'Client'}&background=random`,
@@ -26,6 +27,7 @@ export const ProviderDashboard = () => {
                             location: b.userId?.email || 'N/A', // Displaying email for placeholder
                             time: b.time || new Date(b.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                             price: b.price || 0,
+                            status: b.status,
                             isNew: b.status === 'pending'
                         }));
                         setBookings(mappedBookings);
@@ -50,20 +52,25 @@ export const ProviderDashboard = () => {
 
     const [processingId, setProcessingId] = useState<string | null>(null);
 
-    const handleAction = (id: string, action: 'accept' | 'reject') => {
+    const handleAction = async (id: string, action: 'accept' | 'reject' | 'completed') => {
         setProcessingId(id);
-        // Simulate API call
-        setTimeout(() => {
-            setBookings(prev => prev.filter(b => b.id !== id));
+        const newStatus = action === 'accept' ? 'confirmed' : action;
+
+        try {
+            if (!token) throw new Error("No token");
+            await api.updateBookingStatus(id, newStatus, token);
+
+            if (action === 'reject' || action === 'completed') {
+                setBookings(prev => prev.filter(b => b.id !== id));
+            } else {
+                setBookings(prev => prev.map(b => b.id === id ? { ...b, isNew: false, status: 'confirmed' } : b));
+            }
+            console.log(`Booking ${action} successfully!`);
+        } catch (err: any) {
+            alert(err.message || `Failed to ${action} booking.`);
+        } finally {
             setProcessingId(null);
-            // Feedback
-            const message = action === 'accept' ? 'Booking accepted successfully!' : 'Booking rejected.';
-            // In a real app we would use a toast here.
-            console.log(message);
-            // Minimal alert for feedback requirements if no toast system
-            // alert(message); // Commented out to be less intrusive but "Produce visible feedback" is required.
-            // I'll leave it as state update which is visible (item removed).
-        }, 1000);
+        }
     };
 
     return (
@@ -177,7 +184,7 @@ export const ProviderDashboard = () => {
                     {/* Booking Requests */}
                     <div>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">New Booking Requests</h3>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Active Bookings</h3>
                             <button className="text-sm text-primary font-medium hover:underline">View All</button>
                         </div>
                         <div className="space-y-4">
@@ -206,25 +213,37 @@ export const ProviderDashboard = () => {
                                     <div className="text-center sm:text-right">
                                         <p className="text-xl font-bold text-gray-900 dark:text-white mb-3">${booking.price}</p>
                                         <div className="flex gap-2">
-                                            <button
-                                                onClick={() => handleAction(booking.id, 'reject')}
-                                                disabled={processingId === booking.id}
-                                                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                <X className="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleAction(booking.id, 'accept')}
-                                                disabled={processingId === booking.id}
-                                                className="px-4 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-hover transition-colors flex items-center gap-2 disabled:bg-primary/70 disabled:cursor-not-allowed"
-                                            >
-                                                {processingId === booking.id ? (
-                                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                                ) : (
-                                                    <Check className="w-4 h-4" />
-                                                )}
-                                                {processingId === booking.id ? 'Processing...' : 'Accept'}
-                                            </button>
+                                            {booking.status === 'confirmed' ? (
+                                                <button
+                                                    onClick={() => handleAction(booking.id, 'completed')}
+                                                    disabled={processingId === booking.id}
+                                                    className="px-4 py-2 w-full rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                                >
+                                                    {processingId === booking.id ? 'Processing...' : 'Mark Completed'}
+                                                </button>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleAction(booking.id, 'reject')}
+                                                        disabled={processingId === booking.id}
+                                                        className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        <X className="w-5 h-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleAction(booking.id, 'accept')}
+                                                        disabled={processingId === booking.id}
+                                                        className="px-4 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-hover transition-colors flex items-center gap-2 disabled:bg-primary/70 disabled:cursor-not-allowed"
+                                                    >
+                                                        {processingId === booking.id ? (
+                                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                        ) : (
+                                                            <Check className="w-4 h-4" />
+                                                        )}
+                                                        {processingId === booking.id ? 'Processing...' : 'Accept'}
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </Card>

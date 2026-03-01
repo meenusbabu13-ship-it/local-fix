@@ -35,9 +35,19 @@ const bookingSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+            enum: ['pending', 'confirmed', 'completed', 'cancelled', 'rejected'],
             default: 'pending',
         },
+        rating: {
+            type: Number,
+            min: 1,
+            max: 5,
+            required: false,
+        },
+        review: {
+            type: String,
+            required: false,
+        }
     },
     {
         timestamps: true,

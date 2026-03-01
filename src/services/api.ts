@@ -170,4 +170,45 @@ export const api = {
         if (!response.ok) throw new Error(data.message || 'Failed to create booking');
         return data;
     },
+
+    async getUserBookings(token: string): Promise<any> {
+        const response = await fetch(`${API_URL}/users/bookings`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to fetch user bookings');
+        return data;
+    },
+
+    async updateBookingStatus(id: string, status: string, token: string): Promise<any> {
+        const response = await fetch(`${API_URL}/providers/bookings/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to update booking status');
+        return data;
+    },
+
+    async reviewBooking(id: string, reviewData: { rating: number, review: string }, token: string): Promise<any> {
+        const response = await fetch(`${API_URL}/users/bookings/${id}/review`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(reviewData),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to submit review');
+        return data;
+    },
 };

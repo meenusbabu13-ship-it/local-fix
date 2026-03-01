@@ -104,3 +104,34 @@ export const updateProviderProfile = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Update booking status
+// @route   PUT /api/providers/bookings/:id
+// @access  Private (Provider only)
+export const updateBookingStatus = async (req, res, next) => {
+    try {
+        const { status } = req.body;
+
+        if (!['confirmed', 'completed', 'rejected'].includes(status)) {
+            return res.status(400).json({ success: false, message: 'Invalid status' });
+        }
+
+        const booking = await Booking.findOne({ _id: req.params.id, providerId: req.user.id });
+
+        if (!booking) {
+            return res.status(404).json({ success: false, message: 'Booking not found' });
+        }
+
+        booking.status = status;
+        await booking.save();
+
+        res.status(200).json({
+            success: true,
+            message: `Booking status updated to ${status}`,
+            booking,
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getUserProfile, updateUserProfile, createBooking } from '../controllers/user.controller.js';
+import { getUserProfile, updateUserProfile, createBooking, getUserBookings, reviewBooking } from '../controllers/user.controller.js';
 import authMiddleware from '../middleware/auth.middleware.js';
 import roleMiddleware from '../middleware/role.middleware.js';
 
@@ -23,5 +23,15 @@ router.put('/profile', updateUserProfile);
 // @desc    Create a new booking
 // @access  Private (User only)
 router.post('/booking', createBooking);
+
+// @route   GET /api/users/bookings
+// @desc    Get all user bookings
+// @access  Private (User only)
+router.get('/bookings', getUserBookings);
+
+// @route   POST /api/users/bookings/:id/review
+// @desc    Add a review to a completed booking
+// @access  Private (User only)
+router.post('/bookings/:id/review', reviewBooking);
 
 export default router;
