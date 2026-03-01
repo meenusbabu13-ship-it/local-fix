@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
-import { useAppStore } from '../../stores/useAppStore';
 import { Button } from '../../components/ui/Button';
 import { Shield, Plus, Check, MoreHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export const Roles = () => {
-    const { roles } = useAppStore();
+const roles = [
+    {
+        id: '1',
+        name: 'Admin',
+        permissions: ['Manage Users', 'Approve Providers', 'View Analytics', 'System Settings'],
+    },
+    {
+        id: '2',
+        name: 'ServiceProvider',
+        permissions: ['Manage Services', 'Accept Bookings', 'View Earnings'],
+    },
+    {
+        id: '3',
+        name: 'User',
+        permissions: ['Book Services', 'Write Reviews', 'Manage Profile'],
+    }
+];
 
+export const Roles = () => {
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -39,8 +54,8 @@ export const Roles = () => {
                     >
                         <div className="flex items-start justify-between mb-6">
                             <div className={`p-4 rounded-2xl ${role.name === 'Admin'
-                                    ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400'
-                                    : 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                                ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400'
+                                : 'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                                 }`}>
                                 <Shield className="w-8 h-8" />
                             </div>

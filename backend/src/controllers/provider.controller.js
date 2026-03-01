@@ -1,6 +1,30 @@
 import Provider from '../models/Provider.js';
 import Booking from '../models/Booking.js';
 
+// @desc    Get public providers (approved only), optionally filter by category
+// @route   GET /api/providers/public
+// @access  Public
+export const getPublicProviders = async (req, res, next) => {
+    try {
+        const { category } = req.query;
+        let query = { status: 'approved' };
+
+        if (category) {
+            query.serviceCategory = { $regex: new RegExp(`^${category}$`, 'i') };
+        }
+
+        const providers = await Provider.find(query).select('-password');
+
+        res.status(200).json({
+            success: true,
+            count: providers.length,
+            providers,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @desc    Get provider dashboard data
 // @route   GET /api/providers/dashboard
 // @access  Private (Provider only)

@@ -11,6 +11,7 @@ import { Landing } from './pages/Landing';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { ProviderRegister } from './pages/ProviderRegister';
+import { PublicProviders } from './pages/PublicProviders';
 
 // User Pages
 import { UserHome } from './pages/user/UserHome';
@@ -51,6 +52,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/provider-register" element={<ProviderRegister />} />
+        <Route path="/services" element={<PublicProviders />} />
+        <Route path="/services/:category" element={<PublicProviders />} />
 
         {/* Shared Dashboard Routes (User & Provider) */}
         <Route element={<ProtectedRoute allowedRoles={['User', 'ServiceProvider']} />}>

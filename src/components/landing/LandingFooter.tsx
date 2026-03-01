@@ -52,11 +52,11 @@ export const LandingFooter = () => {
                     <div className="lg:col-span-1">
                         <h4 className="text-lg font-black mb-8 text-slate-900 dark:text-white uppercase tracking-widest text-sm">Services</h4>
                         <ul className="space-y-4 text-slate-500 dark:text-slate-400 font-bold">
-                            <li><Link to="/services" className="hover:text-primary transition-colors">Plumbing</Link></li>
-                            <li><Link to="/services" className="hover:text-primary transition-colors">Electrical</Link></li>
-                            <li><Link to="/services" className="hover:text-primary transition-colors">Carpentry</Link></li>
-                            <li><Link to="/services" className="hover:text-primary transition-colors">Repairs</Link></li>
-                            <li><Link to="/services" className="hover:text-primary transition-colors">Smart Home</Link></li>
+                            <li><Link to="/services/plumbing" className="hover:text-primary transition-colors">Plumbing</Link></li>
+                            <li><Link to="/services/electrical" className="hover:text-primary transition-colors">Electrical</Link></li>
+                            <li><Link to="/services/carpentry" className="hover:text-primary transition-colors">Carpentry</Link></li>
+                            <li><Link to="/services/repairs" className="hover:text-primary transition-colors">Repairs</Link></li>
+                            <li><Link to="/services/smart home" className="hover:text-primary transition-colors">Smart Home</Link></li>
                         </ul>
                     </div>
 

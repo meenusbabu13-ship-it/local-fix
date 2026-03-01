@@ -90,6 +90,20 @@ export const api = {
         return data;
     },
 
+    async getPublicProviders(category?: string): Promise<any> {
+        const url = category
+            ? `${API_URL}/providers/public?category=${encodeURIComponent(category)}`
+            : `${API_URL}/providers/public`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to fetch public providers');
+        return data;
+    },
+
     async approveProvider(id: string, token: string): Promise<any> {
         const response = await fetch(`${API_URL}/admin/providers/${id}/approve`, {
             method: 'PATCH',

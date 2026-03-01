@@ -50,8 +50,9 @@ export const LandingServices = () => {
                             whileInView={{ opacity: 1, scale: 1 }}
                             transition={{ delay: idx * 0.1 }}
                             whileHover={{ y: -20 }}
-                            className="relative h-[500px] rounded-[3.5rem] overflow-hidden group cursor-pointer shadow-premium"
+                            className="relative h-[500px] rounded-[3.5rem] overflow-hidden group shadow-premium"
                         >
+                            <Link to={`/services/${s.name.toLowerCase()}`} className="absolute inset-0 z-20 block cursor-pointer" />
                             <img
                                 src={s.bgi}
                                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-125"
