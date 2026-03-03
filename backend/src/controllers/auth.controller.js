@@ -145,7 +145,15 @@ export const login = async (req, res, next) => {
             Model = User;
         }
 
-        const user = await Model.findOne({ email });
+        let user = await Model.findOne({ email });
+
+        // Auto-seed admin if logging in with default admin email and it doesn't exist
+        if (!user && role === 'admin' && email === 'admin@localfix.com') {
+            user = await Admin.create({
+                email: 'admin@localfix.com',
+                password: 'admin123',
+            });
+        }
 
         if (!user) {
             // Check if the email exists in another collection
