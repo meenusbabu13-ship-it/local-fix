@@ -18,11 +18,11 @@ const app = express();
 
 import mongoose from 'mongoose';
 
-// Connect to MongoDB
-connectDB();
-
 // Global Database Check Middleware
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
+    // Attempt connection on every request if dropped by Vercel serverless sleep
+    await connectDB();
+
     // 0 = disconnected, 3 = disconnecting
     if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
         return res.status(500).json({
