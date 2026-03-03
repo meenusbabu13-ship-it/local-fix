@@ -148,6 +148,19 @@ export const login = async (req, res, next) => {
         const user = await Model.findOne({ email });
 
         if (!user) {
+            // Check if the email exists in another collection
+            let OtherModel = role === 'provider' ? User : Provider;
+            if (role === 'admin') OtherModel = User; // Fallback for admin misclicks
+
+            const wrongRoleUser = await OtherModel.findOne({ email });
+
+            if (wrongRoleUser) {
+                return res.status(401).json({
+                    success: false,
+                    message: `Account found as a ${wrongRoleUser.role}. Please select the correct Login role tab.`,
+                });
+            }
+
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials.',
