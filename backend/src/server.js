@@ -16,10 +16,23 @@ dotenv.config();
 // Initialize Express app
 const app = express();
 
+import mongoose from 'mongoose';
+
 // Connect to MongoDB
 connectDB();
 
-// Middleware
+// Global Database Check Middleware
+app.use((req, res, next) => {
+    // 0 = disconnected, 3 = disconnecting
+    if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+        return res.status(500).json({
+            success: false,
+            message: 'Database is not connected. Please ensure MONGO_URI is precisely set in your Vercel Environment Variables and Network Access is open to 0.0.0.0/0 on MongoDB Atlas.'
+        });
+    }
+    next();
+});
+
 // Middleware
 app.use(cors()); // Allow all origins for easier deployment
 
