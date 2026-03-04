@@ -12,7 +12,7 @@ import { useAppStore } from '../stores/useAppStore';
 export const PublicProviders = () => {
     const { category } = useParams<{ category: string }>();
     const navigate = useNavigate();
-    const { isAuthenticated, token } = useAuthStore();
+    const { isAuthenticated, token, user } = useAuthStore();
     const { addLog } = useAppStore();
 
     const [providers, setProviders] = useState<any[]>([]);
@@ -44,6 +44,13 @@ export const PublicProviders = () => {
             navigate('/login');
             return;
         }
+
+        // Only regular users can book — providers and admins cannot
+        if (user?.role !== 'User') {
+            alert('Only registered users can book services. Please log in with a user account to book.');
+            return;
+        }
+
         setBookingProvider(provider);
         setBookingData({ description: '', date: '', time: '' });
     };
