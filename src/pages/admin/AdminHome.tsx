@@ -83,9 +83,22 @@ export const AdminHome = () => {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="outline" className="hidden sm:flex bg-white dark:bg-dark-card border-slate-200 dark:border-white/10">
-                        <Download className="w-4 h-4 mr-2" />
-                        Export Report
+                    <Button
+                        variant="outline"
+                        className="hidden sm:flex bg-white dark:bg-dark-card border-slate-200 dark:border-white/10"
+                        onClick={async () => {
+                            if (!window.confirm('This will add 4 fake providers. Continue?')) return;
+                            try {
+                                await api.seedMockData(token!);
+                                alert('Mock data added successfully! Please refresh.');
+                                window.location.reload();
+                            } catch (err: any) {
+                                alert(err.message || 'Failed to seed data');
+                            }
+                        }}
+                    >
+                        <RefreshCw className="w-4 h-4 mr-2 text-indigo-500" />
+                        Seed Mock Data
                     </Button>
                     <Button className="shadow-lg shadow-primary/25" onClick={() => navigate('/admin/providers')}>
                         <Activity className="w-4 h-4 mr-2" />

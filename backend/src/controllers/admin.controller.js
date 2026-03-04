@@ -163,3 +163,75 @@ export const getProviders = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Seed mock providers
+// @route   POST /api/admin/seed
+// @access  Private (Admin only)
+export const seedMockData = async (req, res, next) => {
+    try {
+        const mockProviders = [
+            {
+                name: 'John Plumbing',
+                email: `john_${Date.now()}@mock.com`,
+                password: 'password123',
+                phone: '+1 555-0101',
+                serviceCategory: 'plumbing',
+                experience: 10,
+                pricing: 80,
+                address: '123 Fake St, Metropolis',
+                coverageRadius: 20,
+                location: { lat: 40.7128, lng: -74.0060 },
+                status: 'approved',
+                role: 'provider'
+            },
+            {
+                name: 'Sara Electricals',
+                email: `sara_${Date.now()}@mock.com`,
+                password: 'password123',
+                phone: '+1 555-0102',
+                serviceCategory: 'electrical',
+                experience: 5,
+                pricing: 65,
+                address: '456 Electric Ave, Gotham',
+                coverageRadius: 50,
+                location: { lat: 40.7300, lng: -73.9900 },
+                status: 'approved',
+                role: 'provider'
+            },
+            {
+                name: 'Mike Cleaners',
+                email: `mike_${Date.now()}@mock.com`,
+                password: 'password123',
+                phone: '+1 555-0103',
+                serviceCategory: 'cleaning',
+                experience: 2,
+                pricing: 40,
+                address: '789 Clean Blvd, Star City',
+                coverageRadius: 15,
+                location: { lat: 40.7500, lng: -73.9800 },
+                status: 'pending',
+                role: 'provider'
+            },
+            {
+                name: 'Alpha HVAC Pros',
+                email: `alpha_${Date.now()}@mock.com`,
+                password: 'password123',
+                phone: '+1 555-0104',
+                serviceCategory: 'hvac',
+                experience: 12,
+                pricing: 100,
+                address: '321 Frost Rd, Central City',
+                coverageRadius: 100,
+                location: { lat: 40.7800, lng: -73.9500 },
+                status: 'pending',
+                role: 'provider'
+            }
+        ];
+
+        await Promise.all(mockProviders.map(p => Provider.create(p)));
+
+        res.status(200).json({ success: true, message: 'Added 4 mock providers successfully!' });
+    } catch (error) {
+        next(error);
+    }
+};

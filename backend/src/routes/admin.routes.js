@@ -6,6 +6,7 @@ import {
     approveProvider,
     rejectProvider,
     getProviders,
+    seedMockData,
 } from '../controllers/admin.controller.js';
 import authMiddleware from '../middleware/auth.middleware.js';
 import roleMiddleware from '../middleware/role.middleware.js';
@@ -18,6 +19,9 @@ router.use(roleMiddleware('admin'));
 
 // Dashboard stats
 router.get('/dashboard', getAdminDashboard);
+
+// Seed Mock Data
+router.post('/seed', seedMockData);
 
 // Users & providers listing
 router.get('/users', getAllUsers);

@@ -212,4 +212,17 @@ export const api = {
         if (!response.ok) throw new Error(data.message || 'Failed to submit review');
         return data;
     },
+
+    async seedMockData(token: string): Promise<any> {
+        const response = await fetch(`${API_URL}/admin/seed`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to seed mock data');
+        return data;
+    },
 };
