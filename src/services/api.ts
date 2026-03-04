@@ -1,9 +1,23 @@
 const isProd = import.meta.env.PROD;
 const API_URL = import.meta.env.VITE_API_URL || (isProd ? '/api' : 'http://localhost:5000/api');
 
-interface ApiError {
-    message: string;
-    success: boolean;
+// Safely parse JSON — if the server returns an HTML error page (e.g. Vercel
+// serverless crash), response.json() throws a SyntaxError with "Unexpected token".
+// Catch it and surface a human-readable message instead.
+async function safeJson(response: Response): Promise<any> {
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch {
+        // The server returned non-JSON (e.g. an HTML Vercel error page).
+        const match = text.match(/<[^>]+>([^<]{10,})</);
+        const hint = match ? match[1].trim() : text.slice(0, 120);
+        throw new Error(
+            hint
+                ? `Server error: ${hint}`
+                : 'The server returned an unexpected response. Please try again later.'
+        );
+    }
 }
 
 interface AuthResponse {
@@ -23,7 +37,7 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, role }),
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw { ...data, httpStatus: response.status };
         return data;
     },
@@ -34,7 +48,7 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData),
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Registration failed');
         return data;
     },
@@ -44,7 +58,7 @@ export const api = {
             method: 'POST',
             body: formData,
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Registration failed');
         return data;
     },
@@ -57,7 +71,7 @@ export const api = {
                 'Content-Type': 'application/json',
             },
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to fetch profile');
         return data;
     },
@@ -70,7 +84,7 @@ export const api = {
                 'Content-Type': 'application/json',
             },
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to fetch users');
         return data;
     },
@@ -86,7 +100,7 @@ export const api = {
                 'Content-Type': 'application/json',
             },
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to fetch providers');
         return data;
     },
@@ -100,7 +114,7 @@ export const api = {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to fetch public providers');
         return data;
     },
@@ -113,7 +127,7 @@ export const api = {
                 'Content-Type': 'application/json',
             },
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to approve provider');
         return data;
     },
@@ -127,7 +141,7 @@ export const api = {
             },
             body: JSON.stringify({ reason }),
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to reject provider');
         return data;
     },
@@ -140,7 +154,7 @@ export const api = {
                 'Content-Type': 'application/json',
             },
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to delete user');
         return data;
     },
@@ -153,7 +167,7 @@ export const api = {
                 'Content-Type': 'application/json',
             },
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to fetch provider dashboard');
         return data;
     },
@@ -167,7 +181,7 @@ export const api = {
             },
             body: JSON.stringify(bookingData),
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to create booking');
         return data;
     },
@@ -180,7 +194,7 @@ export const api = {
                 'Content-Type': 'application/json',
             },
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to fetch user bookings');
         return data;
     },
@@ -194,7 +208,7 @@ export const api = {
             },
             body: JSON.stringify({ status }),
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to update booking status');
         return data;
     },
@@ -208,7 +222,7 @@ export const api = {
             },
             body: JSON.stringify(reviewData),
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to submit review');
         return data;
     },
@@ -221,7 +235,7 @@ export const api = {
                 'Content-Type': 'application/json',
             },
         });
-        const data = await response.json();
+        const data = await safeJson(response);
         if (!response.ok) throw new Error(data.message || 'Failed to seed mock data');
         return data;
     },
